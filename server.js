@@ -12,7 +12,7 @@ const mqttClient = MQTT.connect(process.env.MQTT_BROKER_URL);
 
 const app = express();
 const server = http.createServer(app);
-
+hhh
 // CORS sadece Netlify frontend'ine izin verir
 app.use(cors({
   origin: "https://yanginizleme.netlify.app",
