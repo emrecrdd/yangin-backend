@@ -24,7 +24,7 @@ app.use(cors({
 app.use(express.json());
 
 // Eğer API route'ların varsa buraya ekleyebilirsin
-app.use("/api/sensors", require("./routes/sensors"));
+app.use("/api/sensors", require("./routes/sensorRoutes"));
 
 const io = socketIo(server, {
   cors: {
