@@ -1,31 +1,12 @@
-const express = require("express");
-const http = require("http");
-const socketIo = require("socket.io");
-const cors = require("cors");
-const dotenv = require("dotenv");
-dotenv.config();
-
-const { connectDB, sequelize } = require("./config/database");
-
-const MQTT = require("mqtt");
+const http = require('http');
+const app = require('./app'); // yukarıdaki app.js'i kullanıyoruz
+const socketIo = require('socket.io');
+const { connectDB, sequelize } = require('./config/database');
+const MQTT = require('mqtt');
 const mqttClient = MQTT.connect(process.env.MQTT_BROKER_URL);
+const PORT = process.env.PORT || 5000;
 
-const app = express();
 const server = http.createServer(app);
-
-// CORS sadece Netlify frontend'ine izin verir
-app.use(cors({
-  origin: "https://yanginizleme.netlify.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
-}));
-
-// JSON body parse
-app.use(express.json());
-
-// Eğer API route'ların varsa buraya ekleyebilirsin
-app.use("/api/sensors", require("./routes/sensorRoutes"));
-
 const io = socketIo(server, {
   cors: {
     origin: "https://yanginizleme.netlify.app",
@@ -33,13 +14,7 @@ const io = socketIo(server, {
   }
 });
 
-const PORT = process.env.PORT || 5000;
-
-app.get("/", (req, res) => {
-  res.send("Merhaba, server çalışıyor.");
-});
-
-mqttClient.on("connect", () => {
+mqttClient.on('connect', () => {
   console.log("MQTT broker bağlandı.");
   mqttClient.subscribe(process.env.MQTT_TOPIC, (err) => {
     if (err) {
@@ -50,12 +25,12 @@ mqttClient.on("connect", () => {
   });
 });
 
-mqttClient.on("message", (topic, message) => {
+mqttClient.on('message', (topic, message) => {
   console.log(`MQTT mesajı geldi: ${message.toString()}`);
-  io.emit("mqtt_message", message.toString());
+  io.emit('mqtt_message', message.toString());
 });
 
-io.on("connection", (socket) => {
+io.on('connection', (socket) => {
   console.log("Yeni socket bağlandı:", socket.id);
 });
 
