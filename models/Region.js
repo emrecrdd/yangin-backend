@@ -10,10 +10,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    boundary: {
-      type: DataTypes.GEOMETRY('POLYGON'), // Harita üzerindeki bölge sınırı
-      allowNull: true,
-    },
+   boundary: {
+  type: DataTypes.JSONB, // veya DataTypes.TEXT
+  allowNull: true,
+},
   }, {
     tableName: 'regions',
     timestamps: true,
