@@ -1,6 +1,7 @@
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
+const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -11,11 +12,29 @@ const mqttClient = MQTT.connect(process.env.MQTT_BROKER_URL);
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+
+// CORS sadece Netlify frontend'ine izin verir
+app.use(cors({
+  origin: "https://yanginizleme.netlify.app",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
+// JSON body parse
+app.use(express.json());
+
+// Eğer API route'ların varsa buraya ekleyebilirsin
+// app.use("/api/sensors", require("./routes/sensors"));
+
+const io = socketIo(server, {
+  cors: {
+    origin: "https://yanginizleme.netlify.app",
+    methods: ["GET", "POST"]
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 
-// Basit bir route
 app.get("/", (req, res) => {
   res.send("Merhaba, server çalışıyor.");
 });
@@ -33,7 +52,6 @@ mqttClient.on("connect", () => {
 
 mqttClient.on("message", (topic, message) => {
   console.log(`MQTT mesajı geldi: ${message.toString()}`);
-  // Socket ile client'lara gönder
   io.emit("mqtt_message", message.toString());
 });
 
