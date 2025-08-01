@@ -4,23 +4,32 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: "postgres",
+  dialect: 'postgres',
+  protocol: 'postgres',
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false // Production'da true yapılmalı, test için false
+      rejectUnauthorized: false // Production'da CA sertifikası ekleyerek true yapın
     }
   },
-  logging: false,
+  logging: console.log, // Hata ayıklama için
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+  }
 });
 
-// Bağlantıyı test et
+// Bağlantı testi fonksiyonunu güncelleyin
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
     console.log("🟢 PostgreSQL bağlantısı başarılı.");
+    await sequelize.sync({ alter: true });
+    console.log("🟢 Tüm modeller veritabanına senkronize edildi.");
   } catch (error) {
-    console.error("🔴 Veritabanı bağlantı hatası:", error.message);
+    console.error("🔴 Veritabanı bağlantı hatası:", error);
     process.exit(1);
   }
 };
