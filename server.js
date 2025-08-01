@@ -1,10 +1,11 @@
 const http = require('http');
-const app = require('./app'); // yukarıdaki app.js'i kullanıyoruz
+const app = require('./app');
 const socketIo = require('socket.io');
 const { connectDB, sequelize } = require('./config/database');
 const MQTT = require('mqtt');
 const mqttClient = MQTT.connect(process.env.MQTT_BROKER_URL);
 const PORT = process.env.PORT || 5000;
+const db = require('./models');  // modelleri bu şekilde import et
 
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -16,12 +17,9 @@ const io = socketIo(server, {
 
 mqttClient.on('connect', () => {
   console.log("MQTT broker bağlandı.");
-  mqttClient.subscribe(process.env.MQTT_TOPIC, (err) => {
-    if (err) {
-      console.error("MQTT abone olma hatası:", err);
-    } else {
-      console.log(`MQTT topic'ine abone olundu: ${process.env.MQTT_TOPIC}`);
-    }
+  mqttClient.subscribe(process.env.MQTT_TOPIC, err => {
+    if (err) console.error("MQTT abone olma hatası:", err);
+    else console.log(`MQTT topic'ine abone olundu: ${process.env.MQTT_TOPIC}`);
   });
 });
 
@@ -30,7 +28,7 @@ mqttClient.on('message', (topic, message) => {
   io.emit('mqtt_message', message.toString());
 });
 
-io.on('connection', (socket) => {
+io.on('connection', socket => {
   console.log("Yeni socket bağlandı:", socket.id);
 });
 
