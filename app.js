@@ -8,8 +8,14 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());               // <-- Burada önce CORS middleware
-app.use(express.json());       // <-- Sonra JSON parsing
+app.use(cors());
+app.use(express.json());
+
+// Ana route
+app.get("/", (req, res) => {
+  res.send("Merhaba, server çalışıyor.");
+});
+
 app.use("/api/sensors", sensorRoutes);
 app.use('/api/alerts', alertRoutes);
 
