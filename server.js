@@ -2,7 +2,7 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 const cors = require("cors");
-const dotenv = require("dotenv");
+const dotenv = require("dotenv");f
 dotenv.config();
 
 const { connectDB, sequelize } = require("./config/database");
