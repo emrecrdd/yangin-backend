@@ -1,19 +1,16 @@
-const app = require('./app');
-const db = require('./models'); // models/index.js otomatik yüklendi
-require('./services/mqttService');
 const http = require('http');
+const app = require('./app');
 const socketService = require('./services/socketService');
+const db = require('./models');
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 db.sequelize.sync({ alter: true })
   .then(() => {
     console.log('🟢 Tüm tablolar başarıyla oluşturuldu/güncellendi.');
 
-    // HTTP server oluştur
     const server = http.createServer(app);
 
-    // Socket.IO server'ını başlat
     socketService.initSocket(server);
 
     server.listen(PORT, () => {
