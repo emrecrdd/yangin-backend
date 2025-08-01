@@ -5,13 +5,23 @@ dotenv.config();
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
+  protocol: "postgres",
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false, // Neon self-signed SSL kullanıyor olabilir
+      rejectUnauthorized: false,  // Neon sertifikası self-signed olabilir
     },
+    // channel_binding Neon için gerekli olabilir, ama çoğu zaman bu ayar yoktur. Eğer sorun olursa kaldırabilirsin.
+    // channel_binding: 'require'  
   },
   logging: false,
+  // pool config önemli, Neon ile connection pooling yaparken düzgün ayarla
+  pool: {
+    max: 10,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
 });
 
 const connectDB = async () => {
