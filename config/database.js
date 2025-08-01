@@ -3,15 +3,17 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
+const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
+  host: DB_HOST,
   dialect: 'postgres',
-  protocol: 'postgres',
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false // Production'da CA sertifikası ekleyerek true yapın
+      rejectUnauthorized: false, // opsiyonel ama genelde Render'da gerekebilir
     }
   },
+});
+,
   logging: console.log, // Hata ayıklama için
   pool: {
     max: 5,
