@@ -1,27 +1,26 @@
 const app = require('./app');
-const { sequelize, connectDB } = require('./config/database');
+const db = require('./models');
+const { connectDB } = require('./config/database');
 require('./services/mqttService');
 const http = require('http');
 const socketService = require('./services/socketService');
 
 const PORT = process.env.PORT || 5000;
 
-// Veritabanı bağlantısını ve sunucuyu başlat
-const startServer = async () => {
+(async () => {
   try {
-    await connectDB();
-    
+    await connectDB();  // DB bağlantısını test et
+    await db.sequelize.sync({ alter: true });
+    console.log('🟢 Tüm tablolar başarıyla oluşturuldu/güncellendi.');
+
     const server = http.createServer(app);
     socketService.initSocket(server);
-    
-    server.listen(PORT, '0.0.0.0', () => {
+
+    server.listen(PORT, () => {
       console.log(`🚀 Sunucu ${PORT} portunda çalışıyor.`);
-      console.log(`🔗 http://localhost:${PORT}`);
     });
-  } catch (error) {
-    console.error('🔴 Sunucu başlatma hatası:', error);
+  } catch (err) {
+    console.error('🔴 Başlatma hatası:', err);
     process.exit(1);
   }
-};
-
-startServer();
+})();
